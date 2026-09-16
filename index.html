@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>약속땃지ni | 땃쥐가 약속 스케줄을 정해준다쮜><</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .font-jua {
+      font-family: 'Jua', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulse-shake {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      20% { transform: scale(1.05) rotate(-3deg); }
+      40% { transform: scale(1.05) rotate(3deg); }
+      60% { transform: scale(1.05) rotate(-3deg); }
+      80% { transform: scale(1.05) rotate(3deg); }
+    }
+    .angry-anim {
+      animation: pulse-shake 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-amber-50 text-slate-800 min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-3xl mx-auto px-4 py-3.5 flex justify-between items-center">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="goToStep(1)">
+        <div class="bg-white/20 p-2 rounded-2xl backdrop-blur-md text-3xl">
+          🐭
+        </div>
+        <div>
+          <h1 class="font-jua text-2xl tracking-tight leading-none text-yellow-200">약속땃지ni</h1>
+          <p class="text-xs text-amber-100 font-medium mt-1">땃쥐가 약속 스케줄을 정해준다쮜><</p>
+        </div>
+      </div>
+      <button onclick="goToStep(1)" class="text-xs font-bold bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition">
+        처음부터 다시 🔄
+      </button>
+    </div>
+  </header>
+
+  <!-- Stepper Indicator -->
+  <div class="max-w-3xl mx-auto px-4 mt-6">
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-100 flex justify-between items-center text-xs md:text-sm font-bold">
+      <div id="step-ind-1" class="flex items-center space-x-1.5 text-amber-600">
+        <span class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">1</span>
+        <span>위치/시간</span>
+      </div>
+      <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+      <div id="step-ind-2" class="flex items-center space-x-1.5 text-slate-400">
+        <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs">2</span>
+        <span>취향선택</span>
+      </div>
+      <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+      <div id="step-ind-3" class="flex items-center space-x-1.5 text-slate-400">
+        <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs">3</span>
+        <span>AI분석</span>
+      </div>
+      <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+      <div id="step-ind-4" class="flex items-center space-x-1.5 text-slate-400">
+        <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs">4</span>
+        <span>약속코스</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-3xl mx-auto px-4 mt-6">
+
+    <!-- STEP 1: 위치 및 시간 입력 -->
+    <section id="step-1" class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-amber-100 space-y-6">
+      <div class="text-center">
+        <span class="text-4xl">📍</span>
+        <h2 class="font-jua text-2xl text-slate-800 mt-2">출발 장소와 여유 시간을 알려다쮜!</h2>
+        <p class="text-xs text-slate-500 mt-1">어디서 오는지 입력해야 중간 위치를 잡는다쮜!</p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Player 1 Location -->
+        <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-100">
+          <label class="block text-sm font-bold text-amber-900 mb-1.5">
+            <i class="fa-solid fa-user text-amber-500 mr-1"></i> 나(1번 닝겐)의 출발지
+          </label>
+          <input type="text" id="loc-1" placeholder="예: 강남역, 홍대입구, 신촌, 잠실..." class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm font-medium">
+        </div>
+
+        <!-- Player 2 Location -->
+        <div class="bg-orange-50/60 p-4 rounded-2xl border border-orange-100">
+          <label class="block text-sm font-bold text-orange-900 mb-1.5">
+            <i class="fa-solid fa-user-group text-orange-500 mr-1"></i> 친구(2번 닝겐)의 출발지
+          </label>
+          <input type="text" id="loc-2" placeholder="예: 사당역, 건대입구, 판교, 노원..." class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm font-medium">
+        </div>
+
+        <!-- Available Time -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <label class="block text-sm font-bold text-slate-700 mb-2">
+            <i class="fa-clock fa-solid text-slate-500 mr-1"></i> 오늘 몇 시간 동안 놀 수 있어?
+          </label>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="setTime(2)" id="time-btn-2" class="time-btn bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs md:text-sm">2시간 (번개)</button>
+            <button onclick="setTime(4)" id="time-btn-4" class="time-btn bg-white hover:bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs md:text-sm border border-slate-200">4시간 (무난)</button>
+            <button onclick="setTime(6)" id="time-btn-6" class="time-btn bg-white hover:bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs md:text-sm border border-slate-200">6시간 (풍족)</button>
+            <button onclick="setTime(9)" id="time-btn-9" class="time-btn bg-white hover:bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs md:text-sm border border-slate-200">하루종일 🔥</button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="goToStep(2)" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-jua text-xl py-4 rounded-2xl shadow-md transition transform active:scale-98">
+        다음 (취향 선택하러 가기) ➔
+      </button>
+    </section>
+
+    <!-- STEP 2: 취향 선택 -->
+    <section id="step-2" class="hidden bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-amber-100 space-y-6">
+      <div class="text-center">
+        <span class="text-4xl">🎨</span>
+        <h2 class="font-jua text-2xl text-slate-800 mt-2">각자 좋아하는 스타일을 골라다쮜!</h2>
+        <p class="text-xs text-slate-500 mt-1">서로 취향 안 맞아서 싸우지 말고 미리 체크해라쮜!</p>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Player 1 Style -->
+        <div>
+          <h3 class="text-sm font-bold text-amber-900 mb-2.5 flex items-center">
+            <span class="bg-amber-100 text-amber-700 text-xs px-2 py-0.5 rounded-full mr-2">1번 닝겐</span> 나 취향
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="style-p1">
+            <button type="button" onclick="toggleStyle(this, 'p1', '맛집탐방')" class="p1-style p-3 border rounded-2xl text-xs font-bold border-amber-500 bg-amber-50 text-amber-700">🍔 맛집탐방</button>
+            <button type="button" onclick="toggleStyle(this, 'p1', '감성카페')" class="p1-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600">☕ 감성카페</button>
+            <button type="button" onclick="toggleStyle(this, 'p1', '활동적')" class="p1-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600">🏃‍♂️ 액티비티/오락</button>
+            <button type="button" onclick="toggleStyle(this, 'p1', '정적/힐링')" class="p1-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600">📚 만화/영화/정적</button>
+          </div>
+        </div>
+
+        <!-- Player 2 Style -->
+        <div>
+          <h3 class="text-sm font-bold text-orange-900 mb-2.5 flex items-center">
+            <span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full mr-2">2번 닝겐</span> 친구 취향
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="style-p2">
+            <button type="button" onclick="toggleStyle(this, 'p2', '맛집탐방')" class="p2-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600">🍔 맛집탐방</button>
+            <button type="button" onclick="toggleStyle(this, 'p2', '감성카페')" class="p2-style p-3 border rounded-2xl text-xs font-bold border-orange-500 bg-orange-50 text-orange-700">☕ 감성카페</button>
+            <button type="button" onclick="toggleStyle(this, 'p2', '활동적')" class="p2-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600">🏃‍♂️ 액티비티/오락</button>
+            <button type="button" onclick="toggleStyle(this, 'p2', '정적/힐링')" class="p2-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600">📚 만화/영화/정적</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex space-x-3 pt-2">
+        <button onclick="goToStep(1)" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-4 rounded-2xl text-sm transition">
+          ◀ 이전
+        </button>
+        <button onclick="startAiAnalysis()" class="w-2/3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-jua text-xl py-4 rounded-2xl shadow-md transition transform active:scale-98">
+          AI 분석 시작하기 ⚡
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 3: AI 조건 분석 중 -->
+    <section id="step-3" class="hidden bg-white p-8 rounded-3xl shadow-sm border border-amber-100 text-center py-16 space-y-6">
+      <div class="relative inline-block">
+        <div class="text-7xl animate-bounce">🐭⚡</div>
+        <div class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full animate-ping">AI</div>
+      </div>
+      <div>
+        <h2 class="font-jua text-2xl text-slate-800">땃쥐가 뇌를 열심히 굴리는 중이다쮜!</h2>
+        <p id="analysis-text" class="text-sm text-slate-500 mt-2 font-medium">중간 위치 계산 중... (강남역 ↔ 홍대입구)</p>
+      </div>
+      
+      <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden max-w-md mx-auto">
+        <div id="progress-bar" class="bg-gradient-to-r from-amber-500 to-orange-500 h-full w-0 transition-all duration-300"></div>
+      </div>
+    </section>
+
+    <!-- STEP 4: 최적 장소 추천 & 땃쥐 채팅 -->
+    <section id="step-4" class="hidden space-y-6">
+      
+      <!-- Recommended Course Header -->
+      <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 md:p-8 rounded-3xl text-white shadow-md relative overflow-hidden">
+        <span class="bg-white/20 text-yellow-200 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">AI 분석 결과</span>
+        <div class="mt-3 flex justify-between items-end">
+          <div>
+            <h2 class="text-xs text-amber-100 font-medium">추천 중간 약속 장소</h2>
+            <h1 id="res-mid-point" class="font-jua text-3xl md:text-4xl text-white mt-0.5">강남역 (중간지점)</h1>
+          </div>
+          <div class="text-right">
+            <span class="text-xs opacity-80 block">예상 이동시간</span>
+            <span id="res-travel-time" class="font-bold text-lg text-yellow-200">각자 약 25분</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Timeline -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-100 space-y-4">
+        <h3 class="font-jua text-xl text-slate-800 flex items-center space-x-2">
+          <span>🎯</span>
+          <span>동선 최적화 맞춤 코스</span>
+        </h3>
+
+        <div id="course-timeline" class="space-y-3 relative border-l-2 border-amber-200 ml-3 pl-4">
+          <!-- Dynamically Generated -->
+        </div>
+      </div>
+
+      <!-- 까칠한 땃쥐 불평/피드백 섹션 (핵심 ⭐) -->
+      <div class="bg-gradient-to-b from-slate-900 to-slate-800 p-6 rounded-3xl text-white shadow-xl space-y-4 border border-slate-700">
+        <div class="flex items-center space-x-3">
+          <div id="ttat-avatar" class="text-4xl bg-slate-800 p-2 rounded-2xl border border-slate-700">
+            🐭
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h3 class="font-jua text-lg text-yellow-400">사회에 찌든 까칠한 땃쥐</h3>
+              <span id="ttat-status" class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold">기분 보통 😐</span>
+            </div>
+            <p class="text-xs text-slate-400">불평하거나 딴지 걸면 땃쥐가 욕하며 화를 냅니다쮜!</p>
+          </div>
+        </div>
+
+        <!-- Chat Output Box -->
+        <div id="chat-box" class="bg-slate-950/80 p-4 rounded-2xl h-48 overflow-y-auto custom-scrollbar space-y-3 text-xs md:text-sm">
+          <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] border border-slate-700">
+            <p class="font-bold text-yellow-400 text-xs mb-1">사회에 찌든 땃쥐</p>
+            야, 내가 시간대랑 위치 계산해서 알차게 짜줬으니까 딴소리 말고 그냥 이대로 가라쮜. 불만 있으면 말해보든가 😡
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form onsubmit="handleTtatFeedback(event)" class="flex space-x-2">
+          <input type="text" id="user-chat-input" placeholder="땃쥐에게 불평하기 (예: 딴 데 가고 싶은데, 비싼데?)" class="flex-1 bg-slate-800 text-white placeholder-slate-500 px-4 py-3 rounded-xl text-xs md:text-sm border border-slate-700 focus:outline-none focus:border-amber-500">
+          <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-3 rounded-xl text-xs md:text-sm transition flex-shrink-0">
+            전송 🔥
+          </button>
+        </form>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // App State
+    let currentStep = 1;
+    let selectedTime = 2;
+    let stylesP1 = ['맛집탐방'];
+    let stylesP2 = ['감성카페'];
+    let angerLevel = 0; // 0: Normal, 1: Annoyed, 2: Angry, 3: Furious
+
+    // Location Midpoint Preset Database
+    const locationMap = {
+      '강남': '강남역', '홍대': '신촌역', '신촌': '신촌역', '사당': '방배역',
+      '건대': '왕십리역', '잠실': '강남역', '노원': '혜화역', '판교': '양재역',
+      '수원': '금정역', '부천': '신도림역', '인천': '부평역'
+    };
+
+    function setTime(hours) {
+      selectedTime = hours;
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.className = "time-btn bg-white hover:bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs md:text-sm border border-slate-200";
+      });
+      const target = document.getElementById(`time-btn-${hours}`);
+      if(target) target.className = "time-btn bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs md:text-sm";
+    }
+
+    function toggleStyle(btn, player, style) {
+      const isP1 = player === 'p1';
+      const arr = isP1 ? stylesP1 : stylesP2;
+      const index = arr.indexOf(style);
+
+      if (index > -1) {
+        if(arr.length > 1) {
+          arr.splice(index, 1);
+          btn.className = `${player}-style p-3 border rounded-2xl text-xs font-bold border-slate-200 text-slate-600`;
+        }
+      } else {
+        arr.push(style);
+        btn.className = `${player}-style p-3 border rounded-2xl text-xs font-bold ${isP1 ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-orange-500 bg-orange-50 text-orange-700'}`;
+      }
+    }
+
+    function goToStep(step) {
+      currentStep = step;
+      document.getElementById('step-1').classList.add('hidden');
+      document.getElementById('step-2').classList.add('hidden');
+      document.getElementById('step-3').classList.add('hidden');
+      document.getElementById('step-4').classList.add('hidden');
+
+      // Update indicator UI
+      for(let i=1; i<=4; i++) {
+        const ind = document.getElementById(`step-ind-${i}`);
+        if(i <= step) {
+          ind.className = "flex items-center space-x-1.5 text-amber-600 font-bold";
+          ind.children[0].className = "w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs";
+        } else {
+          ind.className = "flex items-center space-x-1.5 text-slate-400";
+          ind.children[0].className = "w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs";
+        }
+      }
+
+      document.getElementById(`step-${step}`).classList.remove('hidden');
+    }
+
+    function startAiAnalysis() {
+      const loc1 = document.getElementById('loc-1').value.trim() || "강남역";
+      const loc2 = document.getElementById('loc-2').value.trim() || "홍대입구";
+
+      goToStep(3);
+
+      const bar = document.getElementById('progress-bar');
+      const text = document.getElementById('analysis-text');
+      bar.style.width = '0%';
+
+      text.innerText = `${loc1} ↔ ${loc2} 중간 지점 계산 중...`;
+
+      setTimeout(() => {
+        bar.style.width = '40%';
+        text.innerText = `놀이 가능 시간 (${selectedTime}시간) 동선 분배 중...`;
+      }, 700);
+
+      setTimeout(() => {
+        bar.style.width = '80%';
+        text.innerText = `취향 교집합 (${[...new Set([...stylesP1, ...stylesP2])].join(', ')}) 매칭 중...`;
+      }, 1400);
+
+      setTimeout(() => {
+        bar.style.width = '100%';
+        renderResults(loc1, loc2);
+        goToStep(4);
+        confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+      }, 2100);
+    }
+
+    function renderResults(loc1, loc2) {
+      // Find Midpoint logic
+      let mid = "사당역";
+      if(loc1.includes("강남") || loc2.includes("강남")) mid = "교대역";
+      if(loc1.includes("홍대") || loc2.includes("홍대")) mid = "신촌역";
+      if(loc1.includes("건대") || loc2.includes("건대")) mid = "왕십리역";
+      if(loc1 === "강남역" && loc2 === "홍대입구") mid = "신도림역";
+
+      document.getElementById('res-mid-point').innerText = `${mid} 근처`;
+      document.getElementById('res-travel-time').innerText = `각자 약 20~30분`;
+
+      // Generate Timeline based on time and tastes
+      const timeline = document.getElementById('course-timeline');
+      let html = '';
+
+      // 1. Food
+      html += `
+        <div class="relative">
+          <div class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-amber-500 border-2 border-white"></div>
+          <div class="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-100">
+            <span class="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">STEP 1 • 식사</span>
+            <h4 class="font-bold text-slate-800 text-sm mt-1"> ${mid} 주변 핫플 맛집 탐방</h4>
+            <p class="text-xs text-slate-500 mt-0.5">서로의 취향을 반영한 베스트 웨이팅 맛집</p>
+            <div class="mt-2 flex space-x-2">
+              <a href="https://map.naver.com/v5/search/${encodeURIComponent(mid + ' 맛집')}" target="_blank" class="text-[11px] bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg">네이버 지도 검색 ↗</a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // 2. Activity / Cafe
+      if (selectedTime >= 4) {
+        html += `
+          <div class="relative">
+            <div class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-orange-500 border-2 border-white"></div>
+            <div class="bg-orange-50/50 p-3.5 rounded-2xl border border-orange-100">
+              <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">STEP 2 • 메인 활동</span>
+              <h4 class="font-bold text-slate-800 text-sm mt-1"> 룸카페 & 보드게임 & 감성 카페</h4>
+              <p class="text-xs text-slate-500 mt-0.5">도파민 터지는 보드게임 한판 후 커피 한잔의 여유</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // 3. Relax / Ending
+      html += `
+        <div class="relative">
+          <div class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-slate-400 border-2 border-white"></div>
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded-full">STEP ${selectedTime >= 4 ? 3 : 2} • 마무리</span>
+            <h4 class="font-bold text-slate-800 text-sm mt-1"> 인생네컷 찍기 & 깔끔한 귀가</h4>
+            <p class="text-xs text-slate-500 mt-0.5">막차 걱정 없이 ${selectedTime}시간 딱 채우고 깔끔하게 빠이쮜!</p>
+          </div>
+        </div>
+      `;
+
+      timeline.innerHTML = html;
+    }
+
+    // 까칠한 땃쥐 피드백 대화 로직 (핵심)
+    function handleTtatFeedback(e) {
+      e.preventDefault();
+      const input = document.getElementById('user-chat-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const chatBox = document.getElementById('chat-box');
+
+      // Append User Chat
+      chatBox.innerHTML += `
+        <div class="bg-amber-500/20 text-amber-200 p-3 rounded-2xl rounded-tr-none max-w-[85%] ml-auto text-right border border-amber-500/30">
+          <p class="font-bold text-amber-400 text-xs mb-1">나(닝겐)</p>
+          ${val}
+        </div>
+      `;
+
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Increment anger level
+      angerLevel = Math.min(angerLevel + 1, 3);
+      updateTtatAvatar();
+
+      // Generate Ttat Response with delays
+      setTimeout(() => {
+        const reply = getTtatReply(val, angerLevel);
+        chatBox.innerHTML += `
+          <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none max-w-[85%] border border-slate-700 angry-anim">
+            <p class="font-bold text-yellow-400 text-xs mb-1">사회에 찌든 땃쥐 🐭</p>
+            ${reply}
+          </div>
+        `;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 600);
+    }
+
+    function updateTtatAvatar() {
+      const avatar = document.getElementById('ttat-avatar');
+      const status = document.getElementById('ttat-status');
+
+      if (angerLevel === 1) {
+        avatar.innerText = "🐭💢";
+        status.innerText = "기분 나쁨 ⚡";
+        status.className = "text-[10px] bg-yellow-500 text-slate-900 px-2 py-0.5 rounded-full font-bold";
+      } else if (angerLevel === 2) {
+        avatar.innerText = "🐀🔥";
+        status.innerText = "빡침 주의 😡";
+        status.className = "text-[10px] bg-orange-600 text-white px-2 py-0.5 rounded-full font-bold";
+      } else if (angerLevel >= 3) {
+        avatar.innerText = "🤬💥";
+        status.innerText = "분노 폭발 🤬";
+        status.className = "text-[10px] bg-red-600 text-white px-2 py-0.5 rounded-full font-bold animate-bounce";
+      }
+    }
+
+    function getTtatReply(userMsg, anger) {
+      const angryQuotes = [
+        "아니 바쁜 현대사회에서 AI가 계산 다 해줬더니 뭔 딴소리냐쮜?! 🤬 그냥 좀 처 가라쮜!",
+        "비싸다고? 그럼 집에서 라면이나 끓여 먹든가쮜! 나보고 어쩌라고!! 🔥",
+        "멀다고? 니 발은 폼으로 달렸냐쮜?! 중간지점 계산해 줬더니 투정이 상팔자다쮜!! 🐀",
+        "너네 이러다가 약속 정하는 데만 3시간 쓰고 결국 아무 데도 못 간다쮜! 당장 결정해라쮜!! 💥",
+        "아 머리아파... 닝겐들 요구사항 들어주다 땃쥐 뇌 용량 초과됐다쮜!! 걍 닥치고 이대로 가!! 😡"
+      ];
+
+      if (userMsg.includes("비싸") || userMsg.includes("돈")) {
+        return "돈 없으면 편의점 앞에서 컵라면이나 때리든가쮜!! 억울하면 성공해서 오던가!! 🤬";
+      }
+      if (userMsg.includes("멀어") || userMsg.includes("귀찮")) {
+        return "귀찮으면 걍 집에서 쳐 자라쮜!! 왜 기어나와서 날 괴롭히냐쮜?! 🐀🔥";
+      }
+      if (userMsg.includes("다른") || userMsg.includes("싫어")) {
+        return "싫으면 니들이 직접 짜든가!! AI 땃쥐 파업한다쮜!! 💥";
+      }
+
+      return angryQuotes[Math.floor(Math.random() * angryQuotes.length)];
+    }
+  </script>
+
+</body>
+</html>
